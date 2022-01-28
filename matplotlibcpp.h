@@ -955,7 +955,21 @@ inline void imshow(void* ptr, const NPY_TYPES type, const int rows, const int co
     for (std::map<std::string, std::string>::const_iterator it = keywords.begin();
          it != keywords.end(); ++it) {
         if (it->first == "extent") {
+            std::stringstream ss(it->second);
+            double ext[4];
+            int i = 0;
+            while (ss.good()) {
+                std::string substr;
+                getline(ss, substr, ',');
+                ext[i] = std::stod(substr);
+                i++;
             }
+            PyDict_SetItemString(kwargs, it->first.c_str(),
+                                 Py_BuildValue("(dddd)", ext[0], ext[1], ext[2], ext[3]));
+        } else {
+            PyDict_SetItemString(kwargs, it->first.c_str(),
+                                 PyUnicode_FromString(it->second.c_str()));
+        }
     }
 
     PyObject* res =
@@ -984,6 +998,11 @@ inline void imshow(const float* ptr, const int rows, const int columns, const in
 }
 
 inline void imshow(const double* ptr, const int rows, const int columns, const int colors,
+                   const std::map<std::string, std::string>& keywords = {},
+                   PyObject** out                                     = nullptr) {
+    detail::imshow((void*)ptr, NPY_DOUBLE, rows, columns, colors, keywords, out);
+}
+
 #ifdef WITH_OPENCV
 void imshow(const cv::Mat& image, const std::map<std::string, std::string>& keywords = {}) {
     // Convert underlying type of matrix, if needed
@@ -2277,7 +2296,23 @@ inline void subplot(long nrows, long ncols, long plot_number) {
     Py_DECREF(res);
 }
 
+inline void subplot(long plot_number) {
+    detail::_interpreter::get();
+
+    // construct positional args
+    PyObject* args = PyTuple_New(1);
+    // PyTuple_SetItem(args, 0, PyFloat_FromDouble(nrows));
+    // PyTuple_SetItem(args, 1, PyFloat_FromDouble(ncols));
+    PyTuple_SetItem(args, 0, PyInt_FromLong(plot_number));
+
+    PyObject* res =
+        PyObject_CallObject(detail::_interpreter::get().s_python_function_subplot, args);
     if (!res) throw std::runtime_error("Call to subplot() failed.");
+
+    Py_DECREF(args);
+    Py_DECREF(res);
+}
+
 inline void subplot2grid(long nrows, long ncols, long rowid = 0, long colid = 0, long rowspan = 1,
                          long colspan = 1) {
     detail::_interpreter::get();
