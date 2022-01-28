@@ -955,6 +955,7 @@ inline void imshow(void* ptr, const NPY_TYPES type, const int rows, const int co
     for (std::map<std::string, std::string>::const_iterator it = keywords.begin();
          it != keywords.end(); ++it) {
         if (it->first == "extent") {
+            }
     }
 
     PyObject* res =
