@@ -1,3 +1,10 @@
+#Clean Repo
+cmake
+example
+*.yml
+*.txt
+LICENSE*
+
 # Compiled Object files
 *.slo
 *.lo
