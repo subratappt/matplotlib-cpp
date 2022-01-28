@@ -2276,6 +2276,7 @@ inline void subplot(long nrows, long ncols, long plot_number) {
     Py_DECREF(res);
 }
 
+    if (!res) throw std::runtime_error("Call to subplot() failed.");
 inline void subplot2grid(long nrows, long ncols, long rowid = 0, long colid = 0, long rowspan = 1,
                          long colspan = 1) {
     detail::_interpreter::get();
