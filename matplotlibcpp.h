@@ -11,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <numeric>
+#include <sstream>
 #include <stdexcept>
 #include <string>  // std::stod
 #include <vector>
