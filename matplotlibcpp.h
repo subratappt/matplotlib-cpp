@@ -939,17 +939,22 @@ bool hist(const std::vector<Numeric>& y, long bins = 10, std::string color = "b"
 namespace detail {
 
 inline void imshow(void* ptr, const NPY_TYPES type, const int rows, const int columns,
-                   const int colors, const std::map<std::string, std::string>& keywords,
+                   const char order, const std::map<std::string, std::string>& keywords,
                    PyObject** out) {
     assert(type == NPY_UINT8 || type == NPY_FLOAT || type == NPY_DOUBLE);
-    assert(colors == 1 || colors == 3 || colors == 4);
 
     detail::_interpreter::get();
 
     // construct args
-    npy_intp dims[3] = {rows, columns, colors};
+    npy_intp dims[2] = {rows, columns};
     PyObject* args   = PyTuple_New(1);
-    PyTuple_SetItem(args, 0, PyArray_SimpleNewFromData(colors == 1 ? 2 : 3, dims, type, ptr));
+    if (order == 'F' || order == 'f') {
+        PyTuple_SetItem(
+            args, 0,
+            PyArray_New(&PyArray_Type, 2, dims, type, NULL, ptr, 0, NPY_ARRAY_FARRAY, NULL));
+    } else {
+        PyTuple_SetItem(args, 0, PyArray_SimpleNewFromData(2, dims, type, ptr));
+    }
 
     // construct keyword args
     PyObject* kwargs = PyDict_New();
@@ -991,22 +996,22 @@ inline void imshow(void* ptr, const NPY_TYPES type, const int rows, const int co
 
 }  // namespace detail
 
-inline void imshow(const unsigned char* ptr, const int rows, const int columns, const int colors,
+inline void imshow(const unsigned char* ptr, const int rows, const int columns, const char order,
                    const std::map<std::string, std::string>& keywords = {},
                    PyObject** out                                     = nullptr) {
-    detail::imshow((void*)ptr, NPY_UINT8, rows, columns, colors, keywords, out);
+    detail::imshow((void*)ptr, NPY_UINT8, rows, columns, order, keywords, out);
 }
 
-inline void imshow(const float* ptr, const int rows, const int columns, const int colors,
+inline void imshow(const float* ptr, const int rows, const int columns, const char order,
                    const std::map<std::string, std::string>& keywords = {},
                    PyObject** out                                     = nullptr) {
-    detail::imshow((void*)ptr, NPY_FLOAT, rows, columns, colors, keywords, out);
+    detail::imshow((void*)ptr, NPY_FLOAT, rows, columns, order, keywords, out);
 }
 
-inline void imshow(const double* ptr, const int rows, const int columns, const int colors,
+inline void imshow(const double* ptr, const int rows, const int columns, const char order,
                    const std::map<std::string, std::string>& keywords = {},
                    PyObject** out                                     = nullptr) {
-    detail::imshow((void*)ptr, NPY_DOUBLE, rows, columns, colors, keywords, out);
+    detail::imshow((void*)ptr, NPY_DOUBLE, rows, columns, order, keywords, out);
 }
 
 #ifdef WITH_OPENCV
