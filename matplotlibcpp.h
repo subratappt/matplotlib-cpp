@@ -956,7 +956,12 @@ inline void imshow(void* ptr, const NPY_TYPES type, const int rows, const int co
     for (std::map<std::string, std::string>::const_iterator it = keywords.begin();
          it != keywords.end(); ++it) {
         if (it->first == "extent") {
-            std::stringstream ss(it->second);
+            std::string str = it->second;
+            if (str[0] == '(' && str.back() == ')') {
+                str.erase(0, 1);
+                str.erase(str.length() - 1, 1);
+            }
+            std::stringstream ss(str);
             double ext[4];
             int i = 0;
             while (ss.good()) {
