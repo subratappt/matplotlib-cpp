@@ -942,6 +942,7 @@ inline void imshow(void* ptr, const NPY_TYPES type, const int rows, const int co
                    const char order, const std::map<std::string, std::string>& keywords,
                    PyObject** out) {
     assert(type == NPY_UINT8 || type == NPY_FLOAT || type == NPY_DOUBLE);
+    assert(order == 'C' || order == 'c' || order == 'F' || order == 'f');
 
     detail::_interpreter::get();
 
