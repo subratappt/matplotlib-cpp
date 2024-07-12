@@ -168,6 +168,10 @@ struct _interpreter {
         Py_SetProgramName(name);
         Py_Initialize();
 
+        // Suppress Python warnings
+        PyRun_SimpleString("import warnings");
+        PyRun_SimpleString("warnings.filterwarnings('ignore')");
+
         wchar_t const* dummy_args[] = {
             L"Python", NULL};  // const is needed because literals must not be modified
         wchar_t const** argv = dummy_args;
